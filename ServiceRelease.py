@@ -14,8 +14,8 @@ activation_codes = {}
 # 激活码使用的上限次数
 usage_limit = 2
 
-# 时间戳
-custom_timestamp = None
+# 时间戳文件路径
+timestamp_file = 'custom_timestamp.txt'
 
 def load_activation_codes():
     try:
@@ -76,6 +76,17 @@ def generate_activation_code(code_type):
         if code not in activation_codes and code not in generated_codes:
             return code
 
+def load_custom_timestamp():
+    try:
+        with open(timestamp_file, 'r') as file:
+            return file.read().strip()
+    except FileNotFoundError:
+        return None
+
+def save_custom_timestamp(timestamp):
+    with open(timestamp_file, 'w') as file:
+        file.write(timestamp)
+
 @app.route('/check_activation', methods=['POST'])
 def check_activation():
     activation_code = request.form.get('code')
@@ -133,6 +144,7 @@ def get_unused_activation_codes():
 
 @app.route('/get_timestamp', methods=['GET'])
 def get_timestamp():
+    custom_timestamp = load_custom_timestamp()
     if custom_timestamp:
         return jsonify({'timestamp': custom_timestamp})
     else:
@@ -140,12 +152,11 @@ def get_timestamp():
 
 @app.route('/set_timestamp', methods=['GET'])
 def set_timestamp():
-    global custom_timestamp
     new_timestamp = request.args.get('timestamp')
     if new_timestamp:
-        custom_timestamp = new_timestamp
+        save_custom_timestamp(new_timestamp)
     else:
-        custom_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        save_custom_timestamp(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     return jsonify({'result': 'success'})
 
 if __name__ == '__main__':
