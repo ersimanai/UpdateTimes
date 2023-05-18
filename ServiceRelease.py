@@ -148,15 +148,15 @@ def get_timestamp():
     if custom_timestamp:
         return jsonify({'timestamp': custom_timestamp})
     else:
-        return jsonify({'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+        return jsonify({'timestamp': datetime.timestamp(datetime.now())})
 
 @app.route('/set_timestamp', methods=['GET'])
 def set_timestamp():
     new_timestamp = request.args.get('timestamp')
     if new_timestamp:
-        save_custom_timestamp(new_timestamp)
+        save_custom_timestamp(datetime.timestamp(datetime.strptime(new_timestamp, '%Y-%m-%d %H:%M:%S')))
     else:
-        save_custom_timestamp(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        save_custom_timestamp(datetime.timestamp(datetime.now()))
     return jsonify({'result': 'success'})
 
 if __name__ == '__main__':
