@@ -79,13 +79,13 @@ def generate_activation_code(code_type):
 def load_custom_timestamp():
     try:
         with open(timestamp_file, 'r') as file:
-            return file.read().strip()
+            return int(file.read().strip())
     except FileNotFoundError:
         return None
 
 def save_custom_timestamp(timestamp):
     with open(timestamp_file, 'w') as file:
-        file.write(timestamp)
+        file.write(str(timestamp))
 
 @app.route('/check_activation', methods=['POST'])
 def check_activation():
@@ -134,12 +134,12 @@ def generate_activation_codes():
 @app.route('/get_unused_activation_codes', methods=['GET'])
 def get_unused_activation_codes():
     code_type = request.args.get('type', 'resetTimes')
-    
+
     unused_codes = []
     for code in generated_codes:
         if code.startswith(code_type) and code not in activation_codes:
             unused_codes.append(code)
-    
+
     return jsonify({'unused_codes': unused_codes})
 
 @app.route('/get_timestamp', methods=['GET'])
@@ -148,15 +148,15 @@ def get_timestamp():
     if custom_timestamp:
         return jsonify({'timestamp': custom_timestamp})
     else:
-        return jsonify({'timestamp': datetime.timestamp(datetime.now())})
+        return jsonify({'timestamp': int(datetime.timestamp(datetime.now()))})
 
 @app.route('/set_timestamp', methods=['GET'])
 def set_timestamp():
     new_timestamp = request.args.get('timestamp')
     if new_timestamp:
-        save_custom_timestamp(datetime.timestamp(datetime.strptime(new_timestamp, '%Y-%m-%d %H:%M:%S')))
+        save_custom_timestamp(int(datetime.timestamp(datetime.strptime(new_timestamp, '%Y-%m-%d %H:%M:%S'))))
     else:
-        save_custom_timestamp(datetime.timestamp(datetime.now()))
+        save_custom_timestamp(int(datetime.timestamp(datetime.now())))
     return jsonify({'result': 'success'})
 
 if __name__ == '__main__':
