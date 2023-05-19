@@ -90,7 +90,7 @@ def get_bind_mac(mac_id):
 isFree = free()
 
 #设备绑定了激活码或者免激活码期间activation_done为true
-if not activation_done:
+if not activation_done and not isFree:
     deadline = get_deadline()
     bindmac = get_bind_mac(mac_id)
     if deadline or bindmac:
