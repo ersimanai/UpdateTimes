@@ -160,11 +160,17 @@ def set_timestamp():
 @app.route('/get_bind_mac', methods=['POST'])
 def get_bind_mac():
     mac_id = request.form.get('mac_id')
-    # 在此处根据业务逻辑获取绑定的 MAC 地址
-    # 假设您已经实现了获取绑定的 MAC 地址的功能，并将其存储在 bind_mac 变量中
-    bind_mac = True  # 根据实际情况修改此处
+    bind_mac = False
+
+    for code, info in activation_codes.items():
+        usage_records = info.get('usage_records', [])
+        for record in usage_records:
+            if record['mac_id'] == mac_id:
+                bind_mac = True
+                break
 
     return jsonify({'result': bind_mac})
+
 
 if __name__ == '__main__':
     load_activation_codes()
