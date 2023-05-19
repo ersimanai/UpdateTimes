@@ -28,7 +28,7 @@ def free():
     
     # 判断是否达到使用次数上限
     if usage_count >= max_usage_count:
-        print("免费次数用完了。")
+        #print("免费次数用完了。")
         return False
     
     # 更新使用次数
@@ -100,7 +100,7 @@ if not activation_done:
 
 
 if not activation_done and not isFree:
-    activation_code = input("请输入激活码: ")
+    activation_code = input("免费次数用完了，请输入激活码: ")
     # 构建请求数据
     data = {
         'code': activation_code,
