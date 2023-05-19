@@ -37,34 +37,33 @@ def load_activation_usage():
     try:
         with open('activation_usage.txt', 'r') as file:
             for line in file:
-                code, usage_count, timestamp, mac_address, mac_name = line.strip().split(',')
+                code, usage_count, timestamp, mac_id = line.strip().split(',')
                 usage_records = activation_codes.get(code, {}).get('usage_records', [])
                 if code in activation_codes:
                     if int(usage_count) > activation_codes[code]['usage_count']:
                         activation_codes[code]['usage_count'] = int(usage_count)
                         activation_codes[code]['timestamp'] = timestamp
-                        activation_codes[code]['mac_address'] = mac_address
-                        activation_codes[code]['mac_name'] = mac_name
+                        activation_codes[code]['mac_id'] = mac_id
                         if not usage_records:
                             usage_records = load_activation_records(code)
                             activation_codes[code]['usage_records'] = usage_records
                 else:
-                    activation_codes[code] = {'usage_count': int(usage_count), 'timestamp': timestamp, 'mac_address': mac_address, 'mac_name': mac_name, 'usage_records': usage_records}
+                    activation_codes[code] = {'usage_count': int(usage_count), 'timestamp': timestamp, 'mac_id': mac_id, 'usage_records': usage_records}
     except FileNotFoundError:
         pass
 
-def save_activation_usage(code, usage_count, timestamp, mac_address, mac_name):
+def save_activation_usage(code, usage_count, timestamp, mac_id):
     with open('activation_usage.txt', 'a') as file:
-        file.write(f"{code},{usage_count},{timestamp},{mac_address},{mac_name}\n")
+        file.write(f"{code},{usage_count},{timestamp},{mac_id}\n")
 
 def load_activation_records(code):
     usage_records = []
     try:
         with open('activation_usage.txt', 'r') as file:
             for line in file:
-                record_code, usage_count, timestamp, mac_address, mac_name = line.strip().split(',')
+                record_code, usage_count, timestamp, mac_id = line.strip().split(',')
                 if record_code == code:
-                    usage_records.append({'usage_count': int(usage_count), 'timestamp': timestamp, 'mac_address': mac_address, 'mac_name': mac_name})
+                    usage_records.append({'usage_count': int(usage_count), 'timestamp': timestamp, 'mac_id': mac_id})
     except FileNotFoundError:
         pass
     return usage_records
@@ -90,8 +89,7 @@ def save_custom_timestamp(timestamp):
 @app.route('/check_activation', methods=['POST'])
 def check_activation():
     activation_code = request.form.get('code')
-    mac_address = request.form.get('mac')
-    mac_name = request.form.get('mac_name')
+    mac_id = request.form.get('mac_id')
 
     if activation_code in generated_codes:
         activation_info = activation_codes.get(activation_code, {})
@@ -106,10 +104,10 @@ def check_activation():
             usage_count += 1
             activation_info['usage_count'] = usage_count
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            activation_records = {'usage_count': usage_count, 'timestamp': timestamp, 'mac_address': mac_address, 'mac_name': mac_name}
+            activation_records = {'usage_count': usage_count, 'timestamp': timestamp, 'mac_id': mac_id}
             usage_records.append(activation_records)
-            activation_codes[activation_code] = {'usage_count': int(usage_count), 'timestamp': timestamp, 'mac_address': mac_address, 'mac_name': mac_name, 'usage_records': usage_records}
-            save_activation_usage(activation_code, usage_count, timestamp, mac_address, mac_name)
+            activation_codes[activation_code] = {'usage_count': int(usage_count), 'timestamp': timestamp, 'mac_id': mac_id, 'usage_records': usage_records}
+            save_activation_usage(activation_code, usage_count, timestamp, mac_id)
             return jsonify({'result': 0, 'usage_count': usage_count})
     else:
         return jsonify({'result': -1})
@@ -159,6 +157,10 @@ def set_timestamp():
         save_custom_timestamp(int(datetime.timestamp(datetime.now())))
     return jsonify({'result': 'success'})
 
+@app.route('/get_bind_mac', methods=['POST'])
+def get_bind_mac(mac_id):
+    return jsonify({'result': False})
+    
 if __name__ == '__main__':
     load_activation_codes()
     load_activation_usage()
