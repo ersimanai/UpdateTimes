@@ -99,14 +99,14 @@ def check_activation():
             usage_records = load_activation_records(activation_code)
             activation_info['usage_records'] = usage_records
         if usage_count >= usage_limit:
-            return jsonify({'result': -2, 'usage_count': usage_count,  'usage_records': usage_records})
+            return jsonify({'result': -2, 'usage_count': usage_count, 'usage_records': usage_records})
         else:
             usage_count += 1
             activation_info['usage_count'] = usage_count
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             activation_records = {'usage_count': usage_count, 'timestamp': timestamp, 'mac_id': mac_id}
             usage_records.append(activation_records)
-            activation_codes[activation_code] = {'usage_count': int(usage_count), 'timestamp': timestamp, 'mac_id': mac_id, 'usage_records': usage_records}
+            activation_codes[activation_code] = {'usage_count': usage_count, 'timestamp': timestamp, 'mac_id': mac_id, 'usage_records': usage_records}
             save_activation_usage(activation_code, usage_count, timestamp, mac_id)
             return jsonify({'result': 0, 'usage_count': usage_count})
     else:
@@ -158,9 +158,14 @@ def set_timestamp():
     return jsonify({'result': 'success'})
 
 @app.route('/get_bind_mac', methods=['POST'])
-def get_bind_mac(mac_id):
-    return jsonify({'result': False})
-    
+def get_bind_mac():
+    mac_id = request.form.get('mac_id')
+    # 在此处根据业务逻辑获取绑定的 MAC 地址
+    # 假设您已经实现了获取绑定的 MAC 地址的功能，并将其存储在 bind_mac 变量中
+    bind_mac = True  # 根据实际情况修改此处
+
+    return jsonify({'result': bind_mac})
+
 if __name__ == '__main__':
     load_activation_codes()
     load_activation_usage()
