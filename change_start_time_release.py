@@ -1,3 +1,5 @@
+
+
 import DaVinciResolveScript as dvr_script
 import sys
 import time
@@ -5,6 +7,10 @@ import os
 import requests
 import subprocess
 import getpass
+
+# 禁用 Oh My Zsh 更新提示
+os.environ["DISABLE_UPDATE_PROMPT"] = "true"
+
 
 #体验机会
 def free():
