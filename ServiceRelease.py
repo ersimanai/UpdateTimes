@@ -12,7 +12,7 @@ generated_codes = {}
 activation_codes = {}
 
 # 激活码使用的上限次数
-usage_limit = 2
+usage_limit = 1
 
 # 时间戳文件路径
 timestamp_file = 'custom_timestamp.txt'
