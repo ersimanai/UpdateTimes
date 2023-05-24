@@ -69,7 +69,7 @@ def load_activation_records(code):
     return usage_records
 
 def generate_activation_code(code_type):
-    code_length = 6
+    code_length = 9
     while True:
         code = f"{code_type}_{''.join(random.choices(string.ascii_uppercase + string.digits, k=code_length))}"
         if code not in activation_codes and code not in generated_codes:
