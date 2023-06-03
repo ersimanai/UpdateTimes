@@ -80,7 +80,6 @@ def get_deadline():
 
 # 检查激活码是否绑定到 MAC 地址
 def is_activation_bound(mac_id):
-    return False
     data = {
         'mac_id': mac_id
     }
@@ -171,45 +170,48 @@ window.geometry(f"{window_width}x{window_height}+{x}+{y}")
 text_box = Text(window, height=10, width=50)
 text_box.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-# 为文本框创建滚动条
 scrollbar = Scrollbar(window)
 scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-# 将滚动条与文本框关联
 text_box.config(yscrollcommand=scrollbar.set)
 scrollbar.config(command=text_box.yview)
 
-# 递归遍历媒体池文件夹结构的函数
 def process_folder(folder):
     clips = folder.GetClipList()
 
-    # 遍历文件夹中的每个剪辑，并将开始时间码修改为 00:00:00:00
     for clip in clips:
-        # 获取剪辑名称和当前开始时间码
         clipName = clip.GetName()
         startTimecode = clip.GetClipProperty("Start TC")
         output_text = f"片段名称：{clipName}，开始时间码：{startTimecode}\n"
         text_box.insert(tk.END, output_text)
-        text_box.update()
-
+        text_box.update_idletasks()
         # 将新的开始时间码设置为 00:00:00:00
         newStartTimecode = "00:00:00:00"
         clip.SetClipProperty("Start TC", newStartTimecode)
-        output_text = f"新的开始时间码：{newStartTimecode}\n\n"
+        # 修改时间码后，更新显示
+        modifiedStartTimecode = clip.GetClipProperty("Start TC")
+        output_text = f"修改后的开始时间码：{modifiedStartTimecode}\n"
         text_box.insert(tk.END, output_text)
-        text_box.update()
+        text_box.update_idletasks()
 
-    # 递归处理子文件夹
     subfolders = folder.GetSubFolderList()
+
     for subfolder in subfolders:
         process_folder(subfolder)
 
-# 开始处理根文件夹
-process_folder(rootFolder)
-output_text = "时间码修改成功。\n\n如需进一步协助，请联系微信：Ismaili_yang。"
-text_box.insert(tk.END, output_text)
-text_box.update()
+def start_processing(root_folder):
+    process_folder(root_folder)
 
-# 显示 tkinter 窗口并等待用户交互
-messagebox.showinfo("修改成功", "恭喜修改成功，天天接大单\n\n尔斯麻制作，联系微信：Ismaili_yang")
-#window.mainloop()
+def exit_program():
+    end_button.config(state=tk.DISABLED)
+    window.destroy()
+
+# 创建开始处理按钮
+start_button = tk.Button(window, text="开始处理", command=lambda: start_processing(rootFolder))
+start_button.pack()
+
+end_button = tk.Button(window, text="退出", command=exit_program)
+end_button.pack()
+
+# 运行 tkinter 主循环
+window.mainloop()
