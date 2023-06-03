@@ -80,7 +80,6 @@ def get_deadline():
 
 # 检查激活码是否绑定到 MAC 地址
 def is_activation_bound(mac_id):
-    return False
     data = {
         'mac_id': mac_id
     }
